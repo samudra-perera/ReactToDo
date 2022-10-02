@@ -1,30 +1,33 @@
 const ToDo = require('../models/ToDo')
 
 const getTodos = async (req, res, next) => {
-    const todos = await ToDo.find()
-    res.json(todos)
+    try {
+        const todos = await ToDo.find()
+        res.json(todos)
+    } catch(err) {
+        console.log(err)
+    }
 }
 
 const createToDo = async (req, res, next) => {
     const {text} = await req.body
 
     try {
-        await ToDo.create({text})
+        const newTodo = await ToDo.create({text})
+        res.json(newTodo)
     } catch (error) {
         console.log(error)
     }
-    res.json({message: 'We added a a task to the to do list'})
+    
 }
 
 const deleteToDo = async(req, res, next) => {
     try {
-        await ToDo.remove({_id: req.params.id})
+        const result = await ToDo.deleteOne({_id: req.params.id})
+        res.json(result)
     } catch (error) {
         console.log(error)
     }
-
-    res.json({message: 'Task was deleted'})
-    
 }
 
 const completeToDo = async(req, res, next) => {
@@ -32,12 +35,10 @@ const completeToDo = async(req, res, next) => {
         const todos = await ToDo.findOne({_id: req.params.id})
         todos.completed = !todos.completed
         todos.save()
+        res.json(todos)
     } catch (error) {
         console.log(error)
     }
-    res.json({message: 'Updated the completed'})
-    
-    
 }
 
 exports.getTodos = getTodos
